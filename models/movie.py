@@ -5,8 +5,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models.genre import Genre
 from models.movie_genre import movie_genre_table
-from models.movie_production_company import movie_production_company_table
-from models.production_company import ProductionCompany
+from models.movie_company import movie_company_table
+from models.company import Company
 from models.status_enum import StatusEnum
 
 class Movie(Base):
@@ -32,7 +32,7 @@ class Movie(Base):
     backdrop_path: Mapped[str] = mapped_column(nullable=True)
 
     genres: Mapped[List[Genre]] = relationship(secondary=movie_genre_table)
-    production_companies: Mapped[List[ProductionCompany]] = relationship(secondary=movie_production_company_table)
+    production_companies: Mapped[List[Company]] = relationship(secondary=movie_company_table)
     
     def __repr__(self) -> str:
         return f'<Movie id={self.id}, title={self.title}, genres={self.genres}>'
