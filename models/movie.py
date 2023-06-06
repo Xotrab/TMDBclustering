@@ -2,10 +2,12 @@ from sqlalchemy.types import Enum
 from typing import List
 from models.base import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from models.country import Country
 
 from models.genre import Genre
 from models.movie_genre import movie_genre_table
 from models.movie_company import movie_company_table
+from models.movie_country import movie_country_table
 from models.company import Company
 from models.status_enum import StatusEnum
 
@@ -33,6 +35,7 @@ class Movie(Base):
 
     genres: Mapped[List[Genre]] = relationship(secondary=movie_genre_table)
     production_companies: Mapped[List[Company]] = relationship(secondary=movie_company_table)
+    production_countries: Mapped[List[Country]] = relationship(secondary=movie_country_table)
     
     def __repr__(self) -> str:
         return f'<Movie id={self.id}, title={self.title}, genres={self.genres}>'
