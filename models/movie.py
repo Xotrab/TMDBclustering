@@ -43,7 +43,7 @@ class Movie(Base):
     spoken_languages: Mapped[List[Language]] = relationship(secondary=movie_language_table)
     
     def __repr__(self) -> str:
-        return f'<Movie id={self.id}, title={self.title}, spoken_languages={self.spoken_languages}>'
+        return f'<Movie id={self.id}, title={self.title}>'
 
 class MovieSchema(Schema):
     id = fields.Integer()
