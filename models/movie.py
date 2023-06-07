@@ -61,7 +61,7 @@ class MovieSchema(Schema):
     runtime = fields.Raw(allow_none=True)
     adult = fields.Boolean()
     video = fields.Boolean()
-    # status = fields.String()
+    status = fields.Raw()
     poster_path = fields.String(allow_none=True)
     backdrop_path = fields.String(allow_none=True)
 

@@ -5,7 +5,7 @@ from config import api_url, api_key, language
 from urllib.parse import urlencode, urljoin
 import json
 
-from models.movie import MovieSchema
+from models.movie import Movie, MovieSchema
 
 T = TypeVar('T', bound=Schema)
 
@@ -18,7 +18,7 @@ class TmdbApiService():
             'language': language
         }
     
-    def get_movie_details(self, movie_id: int):
+    def get_movie_details(self, movie_id: int) -> Movie:
         endpoint = f'movie/{movie_id}'
         
         url = self._create_url(endpoint, self.default_params)
@@ -41,5 +41,5 @@ class TmdbApiService():
 
 tmdb_api_service = TmdbApiService()
 result = tmdb_api_service.get_movie_details(713704)
-print(result)
+print(result.status)
     
