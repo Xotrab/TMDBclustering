@@ -1,3 +1,5 @@
+from marshmallow import EXCLUDE, Schema, fields, post_load
+import marshmallow
 from sqlalchemy.types import Enum
 from typing import List
 from models.base import Base
@@ -42,3 +44,42 @@ class Movie(Base):
     
     def __repr__(self) -> str:
         return f'<Movie id={self.id}, title={self.title}, genres={self.genres}>'
+
+class MovieSchema(Schema):
+    id = fields.Integer()
+    title = fields.String()
+    original_title = fields.String()
+    original_language = fields.String()
+    overview = fields.String(allow_none=True)
+    tagline = fields.String(allow_none=True)
+    release_date = fields.String()
+    budget = fields.Integer()
+    popularity = fields.Float()
+    revenue = fields.Integer()
+    vote_average = fields.Float()
+    vote_count = fields.Integer()
+    runtime = fields.Raw(allow_none=True)
+    adult = fields.Boolean()
+    video = fields.Boolean()
+    # status = fields.String()
+    poster_path = fields.String(allow_none=True)
+    backdrop_path = fields.String(allow_none=True)
+
+    #Exclude the unknown JSON fields from the deserialization
+    class Meta:
+        unknown = EXCLUDE
+    
+    @post_load
+    def make_custom_object(self, data, **kwargs):
+        return Movie(**data)
+    
+    def load_enum_field(self, value):
+        try:
+            return StatusEnum[value.upper()]
+        except KeyError:
+            raise ValueError(f"Invalid enum value: {value}")
+
+    @marshmallow.pre_load
+    def preprocess_data(self, data, **kwargs):
+        data['status'] = self.load_enum_field(data.get('status'))
+        return data

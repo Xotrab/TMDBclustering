@@ -1,6 +1,13 @@
+from typing import Type, TypeVar
+from marshmallow import Schema
 import requests
 from config import api_url, api_key, language
 from urllib.parse import urlencode, urljoin
+import json
+
+from models.movie import MovieSchema
+
+T = TypeVar('T', bound=Schema)
 
 class TmdbApiService():
 
@@ -19,15 +26,20 @@ class TmdbApiService():
 
         response = requests.get(url, headers=headers)
 
-        return response.text
+        movie_schema = MovieSchema()
+
+        return self._deserialize_json(response.text, movie_schema)
 
     def _create_url(self, endpoint: str, params: dict) -> str:
         url = urljoin(self.api_url, endpoint)
         encoded_params = urlencode(params)
 
         return url + '?' + encoded_params
+    
+    def _deserialize_json(self, json_str: str, schema: Type[T]):
+        return schema.loads(json_str)
 
 tmdb_api_service = TmdbApiService()
-
-print(tmdb_api_service.get_movie_details(713704))
+result = tmdb_api_service.get_movie_details(713704)
+print(result)
     
