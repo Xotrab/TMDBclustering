@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from models.country import Country, CountrySchema
 
 from models.genre import Genre, GenreSchema
-from models.language import Language
+from models.language import Language, LanguageSchema
 from models.movie_genre import movie_genre_table
 from models.movie_company import movie_company_table
 from models.movie_country import movie_country_table
@@ -43,7 +43,7 @@ class Movie(Base):
     spoken_languages: Mapped[List[Language]] = relationship(secondary=movie_language_table)
     
     def __repr__(self) -> str:
-        return f'<Movie id={self.id}, title={self.title}, genres={self.genres}>'
+        return f'<Movie id={self.id}, title={self.title}, spoken_languages={self.spoken_languages}>'
 
 class MovieSchema(Schema):
     id = fields.Integer()
@@ -68,6 +68,7 @@ class MovieSchema(Schema):
     genres = fields.Nested(GenreSchema, many=True)
     production_companies = fields.Nested(CompanySchema, many=True)
     production_countries = fields.Nested(CountrySchema, many=True)
+    spoken_languages = fields.Nested(LanguageSchema, many=True)
 
     #Exclude the unknown JSON fields from the deserialization
     class Meta:
