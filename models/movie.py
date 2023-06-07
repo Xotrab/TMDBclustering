@@ -12,7 +12,7 @@ from models.movie_genre import movie_genre_table
 from models.movie_company import movie_company_table
 from models.movie_country import movie_country_table
 from models.movie_language import movie_language_table
-from models.company import Company
+from models.company import Company, CompanySchema
 from models.status_enum import StatusEnum
 
 class Movie(Base):
@@ -66,6 +66,7 @@ class MovieSchema(Schema):
     backdrop_path = fields.String(allow_none=True)
 
     genres = fields.Nested(GenreSchema, many=True)
+    production_companies = fields.Nested(CompanySchema, many=True)
 
     #Exclude the unknown JSON fields from the deserialization
     class Meta:

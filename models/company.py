@@ -1,3 +1,4 @@
+from marshmallow import EXCLUDE, Schema, fields, post_load
 from models.base import Base
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -10,3 +11,16 @@ class Company(Base):
 
     def __repr__(self) -> str:
         return f'<Company id={self.id}, name={self.name}, origin_country={self.origin_country}>'
+
+class CompanySchema(Schema):
+    id = fields.Integer()
+    name = fields.String()
+    origin_country = fields.String()
+
+    #Exclude the unknown JSON fields from the deserialization
+    class Meta:
+        unknown = EXCLUDE
+
+    @post_load
+    def make_custom_object(self, data, **kwargs):
+        return Company(**data)
