@@ -6,7 +6,7 @@ from models.base import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from models.country import Country
 
-from models.genre import Genre
+from models.genre import Genre, GenreSchema
 from models.language import Language
 from models.movie_genre import movie_genre_table
 from models.movie_company import movie_company_table
@@ -64,6 +64,8 @@ class MovieSchema(Schema):
     status = fields.Raw()
     poster_path = fields.String(allow_none=True)
     backdrop_path = fields.String(allow_none=True)
+
+    genres = fields.Nested(GenreSchema, many=True)
 
     #Exclude the unknown JSON fields from the deserialization
     class Meta:
