@@ -4,7 +4,7 @@ from sqlalchemy.types import Enum
 from typing import List
 from models.base import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from models.country import Country
+from models.country import Country, CountrySchema
 
 from models.genre import Genre, GenreSchema
 from models.language import Language
@@ -67,6 +67,7 @@ class MovieSchema(Schema):
 
     genres = fields.Nested(GenreSchema, many=True)
     production_companies = fields.Nested(CompanySchema, many=True)
+    production_countries = fields.Nested(CountrySchema, many=True)
 
     #Exclude the unknown JSON fields from the deserialization
     class Meta:
