@@ -26,3 +26,5 @@ class DatabaseFacade():
         # statement = select(Movie)
         # return session.scalars(statement).all()
         return self.session.query(Movie).all()
+
+db_facade = DatabaseFacade()

@@ -37,4 +37,6 @@ class TmdbApiService():
     
     def _deserialize_json(self, json_str: str, schema: Type[T]):
         return schema.loads(json_str)
-    
+
+api_service = TmdbApiService()
+   

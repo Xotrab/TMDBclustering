@@ -1,8 +1,6 @@
-from database_facade import DatabaseFacade
-
-database_facade = DatabaseFacade()
+from database_facade import db_facade
 
 print('CREATING TABLES >>>>')
-database_facade.create_tables()
+db_facade.create_tables()
 
 print('FINISHED >>>>')
