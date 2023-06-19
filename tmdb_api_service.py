@@ -1,11 +1,11 @@
-from typing import Type, TypeVar
+from typing import List, Type, TypeVar
 from marshmallow import Schema
 import requests
 from config import api_url, api_key, language
 from urllib.parse import urlencode, urljoin
 
 from models.movie import Movie, MovieSchema
-from models.paginated_response import PaginatedResponse, ReviewsPaginatedResponseSchema
+from models.paginated_response import ReviewsPaginatedResponse, ReviewsPaginatedResponseSchema
 from models.review import Review
 
 T = TypeVar('T', bound=Schema)
@@ -31,7 +31,7 @@ class TmdbApiService():
 
         return self._deserialize_json(response.text, movie_schema)
     
-    def get_movie_reviews_page(self, movie_id: int, page: int) -> PaginatedResponse:
+    def get_movie_reviews_page(self, movie_id: int, page: int) -> ReviewsPaginatedResponse:
         endpoint = f'movie/{movie_id}/reviews'
 
         params = self.default_params
@@ -45,6 +45,25 @@ class TmdbApiService():
         reviews_paginated_response_schema = ReviewsPaginatedResponseSchema()
 
         return self._deserialize_json(response.text, reviews_paginated_response_schema)
+    
+    def get_movie_reviews(self, movie_id) -> List[Review]:
+        paginated_response = self.get_movie_reviews_page(movie_id, 1)
+        reviews = paginated_response.results
+
+        page = 2
+        while (page <= paginated_response.total_pages):
+            paginated_response = self.get_movie_reviews_page(movie_id, 2)
+            reviews.append(paginated_response.results)
+            page +=1
+
+            # Maximum amount of fetched pages has been capped to 5
+            if (page == 5):
+                break
+        
+        return reviews
+
+
+
 
 
     def _create_url(self, endpoint: str, params: dict) -> str:
