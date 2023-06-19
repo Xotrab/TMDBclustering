@@ -62,10 +62,6 @@ class TmdbApiService():
         
         return reviews
 
-
-
-
-
     def _create_url(self, endpoint: str, params: dict) -> str:
         url = urljoin(self.api_url, endpoint)
         encoded_params = urlencode(params)
