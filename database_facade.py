@@ -19,7 +19,8 @@ class DatabaseFacade():
         Base.metadata.create_all(bind=self.engine)
 
     def add_many(self, movies: List[Movie]) -> None:
-        self.session.add_all(movies)
+        for movie in movies:
+            self.session.merge(movie)
         self.session.commit()
 
     def select_movies(self) -> List[Movie]:
