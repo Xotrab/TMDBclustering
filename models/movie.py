@@ -13,6 +13,7 @@ from models.movie_company import movie_company_table
 from models.movie_country import movie_country_table
 from models.movie_language import movie_language_table
 from models.company import Company, CompanySchema
+from models.review import Review
 from models.status_enum import StatusEnum
 
 class Movie(Base):
@@ -41,6 +42,7 @@ class Movie(Base):
     production_companies: Mapped[List[Company]] = relationship(secondary=movie_company_table)
     production_countries: Mapped[List[Country]] = relationship(secondary=movie_country_table)
     spoken_languages: Mapped[List[Language]] = relationship(secondary=movie_language_table)
+    reviews: Mapped[List[Review]] = relationship()
     
     def __repr__(self) -> str:
         return f'<Movie id={self.id}, title={self.title}>'

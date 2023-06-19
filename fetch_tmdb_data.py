@@ -5,6 +5,10 @@ from tmdb_api_service import api_service
 print('FETCHING TMDB DATA >>>>')
 movie = api_service.get_movie_details(713704)
 
+reviews = api_service.get_movie_reviews(713704)
+
+movie.reviews = reviews
+
 print('ADDING DATA TO THE DATABASE >>>>')
 db_facade.add_many([movie])
 
