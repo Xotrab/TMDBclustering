@@ -15,6 +15,9 @@ class ReviewsPaginatedResponse(PaginatedResponse):
     def __init__(self, results: List[Review], page: int, total_pages: int, total_results: int) -> None:
         super().__init__(page, total_pages, total_results)
         self.results = results
+    
+    def __repr__(self) -> str:
+        return f'<ReviewsPaginatedResponse page={self.page}, total_pages={self.total_pages}, total_results={self.total_results}, results={self.results}>'
 
 class ReviewsPaginatedResponseSchema(Schema):
     results = fields.Nested(ReviewSchema, many=True)
