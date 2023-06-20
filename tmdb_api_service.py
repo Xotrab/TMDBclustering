@@ -1,7 +1,8 @@
+import os
 from typing import List, Type, TypeVar
 from marshmallow import Schema
 import requests
-from config import api_url, api_key, language
+from config import api_url, api_key, language, image_api_url, image_width, images_directory
 from urllib.parse import urlencode, urljoin
 
 from models.movie import Movie, MovieSchema
@@ -14,6 +15,9 @@ class TmdbApiService():
 
     def __init__(self) -> None:
         self.api_url = api_url
+        self.image_api_url = image_api_url
+        self.image_width = image_width
+        self.images_directory = images_directory
         self.default_params = {
             'api_key': api_key,
             'language': language
@@ -30,6 +34,29 @@ class TmdbApiService():
         movie_schema = MovieSchema()
 
         return self._deserialize_json(response.text, movie_schema)
+    
+    def save_image(self, image_path: str):
+        os.makedirs(self.images_directory, exist_ok=True)
+
+        url = f'{self.image_api_url}{self.image_width}{image_path}'
+
+        response = requests.get(url, stream=True)
+        response.raise_for_status()
+
+        image_name = image_path[1:]
+        
+        image_path = os.path.join(self.images_directory, image_name)
+        
+        if os.path.exists(image_path):
+            print(f"IMAGE '{image_name}' ALREADY EXISTS IN THE DIRECTORY >>>>")
+        else:
+            with open(image_path, 'wb') as file:
+                for chunk in response.iter_content(chunk_size=8192):
+                    file.write(chunk)
+            
+            print(f"IMAGE SAVED LOCALLY AT: {image_path} >>>>")
+
+
     
     def get_movie_reviews_page(self, movie_id: int, page: int) -> ReviewsPaginatedResponse:
         endpoint = f'movie/{movie_id}/reviews'
