@@ -93,7 +93,7 @@ class TmdbApiService():
         page = 2
         while (page <= paginated_response.total_pages):
             paginated_response = self.get_movie_reviews_page(movie_id, 2)
-            reviews.append(paginated_response.results)
+            reviews.extend(paginated_response.results)
             page +=1
 
             # Maximum amount of fetched pages has been capped to 5
