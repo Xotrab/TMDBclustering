@@ -32,8 +32,9 @@ with open(movie_ids_json_path, "r", encoding=json_encoding) as file:
         movie_id = json_data.get("id")
 
         if movie_id is not None:
-            print(f'FETCHING TMDB DATA FOR MOVIE ID={movie_id} >>>>')
+            print(f'FETCHING TMDB DATA FOR MOVIE ID={movie_id}, LINE={line_count}>>>>')
             movie = api_service.get_movie_details(movie_id)
+            movie.production_companies = remove_duplicates(movie.production_companies)
 
             reviews = api_service.get_movie_reviews(movie_id)
 
