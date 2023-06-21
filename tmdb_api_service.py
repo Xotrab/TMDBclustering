@@ -4,6 +4,7 @@ from marshmallow import Schema
 import requests
 from config import api_url, api_key, language, image_api_url, image_width, images_directory
 from urllib.parse import urlencode, urljoin
+from models.credits import Credits, CreditsSchema
 
 from models.movie import Movie, MovieSchema
 from models.paginated_response import ReviewsPaginatedResponse, ReviewsPaginatedResponseSchema
@@ -34,6 +35,18 @@ class TmdbApiService():
         movie_schema = MovieSchema()
 
         return self._deserialize_json(response.text, movie_schema)
+    
+    def get_movie_credits(self, movie_id: int) -> Credits:
+        endpoint = f'movie/{movie_id}/credits'
+
+        url = self._create_url(endpoint, self.default_params)
+        headers = {"accept": "application/json"}
+
+        response = requests.get(url, headers=headers)
+
+        credits_schema = CreditsSchema()
+        
+        return self._deserialize_json(response.text, credits_schema)
     
     def save_image(self, image_path: str):
         os.makedirs(self.images_directory, exist_ok=True)
