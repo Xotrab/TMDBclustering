@@ -1,3 +1,4 @@
+import re
 from marshmallow import EXCLUDE, Schema, fields, post_load
 import marshmallow
 from sqlalchemy.types import Enum
@@ -85,9 +86,10 @@ class MovieSchema(Schema):
     def make_custom_object(self, data, **kwargs):
         return Movie(**data)
     
-    def load_enum_field(self, value):
+    def load_enum_field(self, value: str):
         try:
-            return StatusEnum[value.upper()]
+            preprocessed_value = re.sub(r'\s+', '_', value.strip())
+            return StatusEnum[preprocessed_value.upper()]
         except KeyError:
             raise ValueError(f"Invalid enum value: {value}")
 
