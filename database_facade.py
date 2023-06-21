@@ -7,6 +7,7 @@ from models.genre import Genre
 from models.company import Company
 from models.country import Country
 from models.language import Language
+from models.person import Person
 from sqlalchemy.orm import Session
 
 class DatabaseFacade():

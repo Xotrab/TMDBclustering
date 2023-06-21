@@ -20,6 +20,11 @@ with open(movie_ids_json_path, "r", encoding=json_encoding) as file:
 
             movie.reviews = reviews
 
+            credits = api_service.get_movie_credits(movie_id)
+
+            movie.cast = credits.cast
+            movie.directors = credits.crew
+
             print('ADDING DATA TO THE DATABASE >>>>')
             db_facade.add_many([movie])
 
