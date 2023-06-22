@@ -6,4 +6,4 @@ class StatusEnum(Enum):
     IN_PRODUCTION = 'In Production',
     POST_PRODUCTION = 'Post Production',
     RELEASED = 'Released',
-    CANCELLED = 'Cancelled'
+    CANCELED = 'Canceled'
