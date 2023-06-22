@@ -58,7 +58,7 @@ class VariationalAutoencoder(tf.Keras.model):
         pass
     
     def compile_model(self):
-        pass
+        self.compile(optimizer=tf.keras.optimizers.Adam(), loss=self.vae_loss)
 
     def train(self):
         pass
