@@ -54,8 +54,17 @@ class VariationalAutoencoder(tf.Keras.model):
         _, _, z = self.encoder(input)
         return self.decoder(z)
     
-    def vae_loss(self):
-        pass
+    def vae_loss(self, input, output, z_mean, z_log_var):
+        # Calculate the reconstruction loss using the binary crossentropy
+        reconstruction_loss = tf.keras.losses.binary_crossentropy(input, output)
+
+        # Reduce the loss by taking the mean across all dimensions but the batch dimension
+        reconstruction_loss = tf.reduce_mean(reconstruction_loss, axis=(1, 2))
+        
+        # Calcualte the KL divergence loss
+        kl_loss = -0.5 * tf.reduce_sum(1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var), axis=-1)
+        
+        return reconstruction_loss + kl_loss
     
     def compile_model(self):
         self.compile(optimizer=tf.keras.optimizers.Adam(), loss=self.vae_loss)
