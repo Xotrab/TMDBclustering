@@ -14,7 +14,7 @@ class VariationalAutoencoder(tf.keras.Model):
         self.optimizer = optimizer
 
         # Encoder
-        self.encoder_input = tf.keras.Input(shape=(self.input_width, self.input_height, 3), name='input')
+        self.encoder_input = tf.keras.Input(shape=(self.input_height, self.input_width, 3), name='input')
 
         self.encoder = self.build_encoder()
 
@@ -52,8 +52,8 @@ class VariationalAutoencoder(tf.keras.Model):
         return tf.keras.Model(self.encoder_input, [z_mean, z_log_var, z], name="encoder")
     
     def build_decoder(self):
-        x = layers.Dense(self.input_width // 8 * self.input_height // 8 * 128, activation="relu")(self.decoder_input)
-        x = layers.Reshape((self.input_width // 8, self.input_height // 8, 128))(x)
+        x = layers.Dense(self.input_height // 8 * self.input_width // 8 * 128, activation="relu")(self.decoder_input)
+        x = layers.Reshape((self.input_height // 8, self.input_width // 8, 128))(x)
         x = layers.Conv2DTranspose(128, 3, activation="relu", strides=2, padding="same")(x)
         x = layers.Conv2DTranspose(64, 3, activation="relu", strides=2, padding="same")(x)
         x = layers.Conv2DTranspose(32, 3, activation="relu", strides=2, padding="same")(x)
