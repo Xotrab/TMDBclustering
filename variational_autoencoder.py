@@ -85,9 +85,6 @@ class VariationalAutoencoder(tf.keras.Model):
         self.compile(optimizer=self.optimizer)
 
     def train(self, data_loader, epochs):
-        # x_train, x_test = data_loader.get_train_test_data()
-        # self.fit(x_train, x_train, batch_size=data_loader.batch_size, epochs=epochs, validation_data=(x_test, x_test))
-        # self.fit(data_loader, epochs=epochs)
          for epoch in range(epochs):
 
             progress_bar = tqdm(data_loader, desc=f"Epoch {epoch+1}/{epochs}", unit="batch")
@@ -101,8 +98,10 @@ class VariationalAutoencoder(tf.keras.Model):
                 gradients = tape.gradient(loss, self.trainable_variables)
                 self.optimizer.apply_gradients(zip(gradients, self.trainable_variables))
 
-                # Update the progress bar description with the current loss
-                progress_bar.set_postfix({"Loss": loss.numpy()})
+                # Update the progress bar description with the current avaerage loss
+                progress_bar.set_postfix({"Average loss": np.mean(loss.numpy())})
+
+                # TODO I would like to show new line for each batch and then calculate the average for a batch
 
             # Close the progress bar after each epoch
             progress_bar.close()
