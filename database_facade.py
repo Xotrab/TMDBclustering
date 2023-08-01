@@ -31,6 +31,7 @@ class DatabaseFacade():
         return self.session.query(Movie).filter(
             and_(
                 Movie.poster_path.isnot(None),
+                Movie.overview.isnot(''),
                 Movie.genres.any(),
                 Movie.production_companies.any(),
                 Movie.production_countries.any(),

@@ -94,7 +94,7 @@ class VariationalAutoencoder(nn.Module):
         for epoch in range(epochs):
             batch_train_losses = []
             progress_bar = tqdm(data_loader, desc=f"Epoch {epoch+1}/{epochs}", unit="batch")
-            for batch, _ in progress_bar:
+            for batch in progress_bar:
                 batch = batch.to(self.device)
                 self.optimizer.zero_grad()
 

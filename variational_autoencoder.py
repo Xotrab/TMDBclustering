@@ -5,7 +5,7 @@ import numpy as np
 
 class VariationalAutoencoder(tf.keras.Model):
 
-    def __init__(self, latent_dim, input_width, input_height, optimizer=tf.keras.optimizers.Adam()):
+    def __init__(self, latent_dim, input_width, input_height, optimizer=tf.keras.optimizers.Adam(learning_rate=0.01)):
         super(VariationalAutoencoder, self).__init__()
 
         self.latent_dim = latent_dim
@@ -36,6 +36,8 @@ class VariationalAutoencoder(tf.keras.Model):
         x = layers.Conv2D(32, 3, activation="relu", strides=2, padding="same")(self.encoder_input)
         x = layers.Conv2D(64, 3, activation="relu", strides=2, padding="same")(x)
         x = layers.Conv2D(128, 3, activation="relu", strides=2, padding="same")(x)
+        x = layers.Conv2D(128, 3, activation="relu", strides=2, padding="same")(x)
+        x = layers.Conv2D(128, 3, activation="relu", strides=2, padding="same")(x)
 
         # Flatten the output and pass it throught the dense layer
         x = layers.Flatten()(x)
@@ -52,8 +54,10 @@ class VariationalAutoencoder(tf.keras.Model):
         return tf.keras.Model(self.encoder_input, [z_mean, z_log_var, z], name="encoder")
     
     def build_decoder(self):
-        x = layers.Dense(self.input_height // 8 * self.input_width // 8 * 128, activation="relu")(self.decoder_input)
-        x = layers.Reshape((self.input_height // 8, self.input_width // 8, 128))(x)
+        x = layers.Dense(self.input_height // 32 * self.input_width // 32 * 128, activation="relu")(self.decoder_input)
+        x = layers.Reshape((self.input_height // 32, self.input_width // 32, 128))(x)
+        x = layers.Conv2DTranspose(128, 3, activation="relu", strides=2, padding="same")(x)
+        x = layers.Conv2DTranspose(128, 3, activation="relu", strides=2, padding="same")(x)
         x = layers.Conv2DTranspose(128, 3, activation="relu", strides=2, padding="same")(x)
         x = layers.Conv2DTranspose(64, 3, activation="relu", strides=2, padding="same")(x)
         x = layers.Conv2DTranspose(32, 3, activation="relu", strides=2, padding="same")(x)
@@ -70,8 +74,8 @@ class VariationalAutoencoder(tf.keras.Model):
         return decoder_output, z_mean, z_log_var, z
     
     def vae_loss(self, input, output, z_mean, z_log_var):
-        # Calculate the reconstruction loss using the binary crossentropy
-        reconstruction_loss = tf.keras.losses.binary_crossentropy(input, output) #Maybe should use MSE instead?
+        # Calculate the reconstruction loss using the mse
+        reconstruction_loss = tf.keras.losses.mean_squared_error(input, output) #Maybe should use MSE instead?
 
         # Reduce the loss by taking the mean across all dimensions but the batch dimension
         reconstruction_loss = tf.reduce_mean(reconstruction_loss, axis=(1, 2))
@@ -79,13 +83,17 @@ class VariationalAutoencoder(tf.keras.Model):
         # Calcualte the KL divergence loss
         kl_loss = -0.5 * tf.reduce_sum(1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var), axis=-1)
         
-        return reconstruction_loss + kl_loss
+        return 2500.0 * reconstruction_loss + kl_loss
     
     def compile_model(self):
         self.compile(optimizer=self.optimizer)
 
     def train(self, data_loader, epochs):
-         for epoch in range(epochs):
+        epoch_avg_train_losses = []
+
+        for epoch in range(epochs):
+
+            batch_train_losses = []
 
             progress_bar = tqdm(data_loader, desc=f"Epoch {epoch+1}/{epochs}", unit="batch")
 
@@ -94,17 +102,21 @@ class VariationalAutoencoder(tf.keras.Model):
                 with tf.GradientTape() as tape:
                     decoder_output, z_mean, z_log_var, z = self.call(batch)
                     loss = self.vae_loss(batch, decoder_output, z_mean, z_log_var)
-                
+
                 gradients = tape.gradient(loss, self.trainable_variables)
                 self.optimizer.apply_gradients(zip(gradients, self.trainable_variables))
 
-                # Update the progress bar description with the current avaerage loss
-                progress_bar.set_postfix({"Average loss": np.mean(loss.numpy())})
+                batch_train_losses.extend(loss.numpy())
 
-                # TODO I would like to show new line for each batch and then calculate the average for a batch
+            epoch_average_train_loss = np.mean(batch_train_losses)
+            epoch_avg_train_losses.append(epoch_average_train_loss)
+
+            progress_bar.set_postfix({"Epoch average train loss": epoch_average_train_loss})
 
             # Close the progress bar after each epoch
             progress_bar.close()
+
+        return epoch_avg_train_losses
 
     def get_feature_vector(self, input):
         z_mean, _, _ = self.encoder(input)
