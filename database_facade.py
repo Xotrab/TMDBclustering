@@ -26,8 +26,6 @@ class DatabaseFacade():
         self.session.commit()
 
     def select_movies(self) -> List[Movie]:
-        # statement = select(Movie)
-        # return session.scalars(statement).all()
         return self.session.query(Movie).filter(
             and_(
                 Movie.poster_path.isnot(None),

@@ -36,7 +36,23 @@ with open(movie_ids_json_path, "r", encoding=json_encoding) as file:
             movie = api_service.get_movie_details(movie_id)
             movie.production_companies = remove_duplicates(movie.production_companies)
 
+            if not movie.poster_path or not movie.overview or not movie.genres:
+                print('SKIPPING - MOVIE IS MISSING POSTER PATH, OVERVIEW OR GENRES>>>>')
+
+                if line_count >= args.start_line + args.num_lines - 1:
+                    break
+                else:
+                    continue
+
             reviews = api_service.get_movie_reviews(movie_id)
+
+            if not reviews:
+                print('SKIPPING - MOVIE IS MISSING REVIEWS>>>>')
+
+                if line_count >= args.start_line + args.num_lines - 1:
+                    break
+                else:
+                    continue
 
             movie.reviews = reviews
 
@@ -45,12 +61,19 @@ with open(movie_ids_json_path, "r", encoding=json_encoding) as file:
             movie.cast = remove_duplicates(credits.cast)
             movie.directors = credits.crew
 
+            if not movie.cast or not movie.directors:
+                print('SKIPPING - MOVIE IS MISSING CREDITS>>>>')
+
+                if line_count >= args.start_line + args.num_lines - 1:
+                    break
+                else:
+                    continue
+
             print('ADDING DATA TO THE DATABASE >>>>')
             db_facade.add_many([movie])
 
-            if (movie.poster_path):
-                print('FETCHING TMDB MOVIE POSTER >>>>')
-                api_service.save_image(movie.poster_path)
+            print('FETCHING TMDB MOVIE POSTER >>>>')
+            api_service.save_image(movie.poster_path)
 
             print('FINISHED >>>>')
 
