@@ -38,7 +38,7 @@ class Movie(Base):
     runtime: Mapped[int] = mapped_column(nullable=True)
     adult: Mapped[bool] = mapped_column(nullable=False)
     video: Mapped[bool] = mapped_column(nullable=False)
-    status = mapped_column(Enum(StatusEnum), nullable=False)
+    status = mapped_column(Enum(StatusEnum), nullable=True)
     poster_path: Mapped[str] = mapped_column(nullable=True)
     backdrop_path: Mapped[str] = mapped_column(nullable=True)
 
@@ -87,6 +87,8 @@ class MovieSchema(Schema):
         return Movie(**data)
     
     def load_enum_field(self, value: str):
+        if value == None:
+            return None
         try:
             preprocessed_value = re.sub(r'\s+', '_', value.strip())
             return StatusEnum[preprocessed_value.upper()]

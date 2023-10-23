@@ -8,7 +8,8 @@ from models.company import Company
 from models.country import Country
 from models.language import Language
 from models.person import Person
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload, subqueryload
+from sqlalchemy import and_
 
 class DatabaseFacade():
 
@@ -25,8 +26,26 @@ class DatabaseFacade():
         self.session.commit()
 
     def select_movies(self) -> List[Movie]:
-        # statement = select(Movie)
-        # return session.scalars(statement).all()
-        return self.session.query(Movie).all()
+        return self.session.query(Movie).filter(
+            and_(
+                Movie.poster_path.isnot(None),
+                Movie.overview.isnot(''),
+                Movie.genres.any(),
+                Movie.production_companies.any(),
+                Movie.production_countries.any(),
+                Movie.spoken_languages.any(),
+                Movie.reviews.any(),
+                Movie.cast.any(),
+                Movie.directors.any()
+            )
+        ).options(
+            joinedload(Movie.genres),
+            joinedload(Movie.production_companies),
+            joinedload(Movie.production_countries),
+            joinedload(Movie.spoken_languages),
+            subqueryload(Movie.reviews),
+            subqueryload(Movie.cast),
+            joinedload(Movie.directors),
+        ).all()
 
 db_facade = DatabaseFacade()
